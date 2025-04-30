@@ -1,3 +1,7 @@
 create database lev_express 
 
-create table if not exists entregador(id serial primary key, cnh char(9) not null, nome varchar(255) not null);
+CREATE TABLE IF NOT EXISTS entregador (
+    id SERIAL PRIMARY KEY,
+    cnh CHAR(9) NOT NULL UNIQUE,
+    nome VARCHAR(255) NOT NULL,
+);
