@@ -1,5 +1,5 @@
 // controllers/entregador.js
-const Entregador = require('../models/Entregador');
+const Entregador = require('./models/Entregador');
 
 // Criar um novo entregador
 exports.create = async (req, res) => {
@@ -92,4 +92,4 @@ exports.delete = async (req, res) => {
         console.error('Erro ao deletar entregador:', error);
         res.status(500).json({ error: 'Erro ao deletar entregador' });
     }
-};
+};  
