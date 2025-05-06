@@ -38,7 +38,7 @@ class _RegisterFormState extends State<RegisterForm> {
           body: json.encode({'nome': _name, 'email': emailNormalizado, 'senha': _password, 'cnh': _cnh}),
         );
         if (response.statusCode == 200) {
-          Navigator.pushReplacementNamed(context, '/home');
+          _loginCadastro();
         } else {
           setState(() {
             _error = 'Dados incorretos.';
@@ -54,6 +54,10 @@ class _RegisterFormState extends State<RegisterForm> {
         });
       }
     }
+  }
+
+  void _loginCadastro() {
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
@@ -167,7 +171,7 @@ class _RegisterFormState extends State<RegisterForm> {
               hintText: 'Digite o número da sua CNH',
             ),
             validator: (value) {
-              if (value == null || value.isEmpty) {
+              if (value == null || value.isEmpty || value.length != 11) {
                 return 'Por favor, insira um número de CNH válido';
               }
               return null;

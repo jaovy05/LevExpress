@@ -35,7 +35,7 @@ class _LoginFormState extends State<LoginForm> {
           body: json.encode({'nome': emailNormalizado, 'senha': _password}),
         );
         if (response.statusCode == 200) {
-          Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushReplacementNamed(context, '/login');
         } else {
           setState(() {
             _error = 'Email ou senha incorretos.';
@@ -55,6 +55,11 @@ class _LoginFormState extends State<LoginForm> {
 
   void _cadastro() {
     Navigator.pushReplacementNamed(context, '/register');
+  }
+
+  // TO DO
+  void _toBeDone() {
+    Navigator.pushReplacementNamed(context, '/passwordReset');
   }
 
   @override
@@ -133,7 +138,7 @@ class _LoginFormState extends State<LoginForm> {
               ),
               SizedBox(height: 8),
               TextButton(
-              onPressed: _cadastro,
+              onPressed: _toBeDone,
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Text(

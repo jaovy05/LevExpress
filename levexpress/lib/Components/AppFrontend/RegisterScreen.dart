@@ -8,6 +8,12 @@ class Registerscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/login');
+          }, 
+          icon: const Icon(Icons.arrow_back, color: Colors.black)
+        ),
         title: const Center(
           child: Text('LevExpress',
             style: TextStyle(
