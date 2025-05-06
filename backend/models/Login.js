@@ -4,34 +4,34 @@ const sequelize = require('../config/database');
 const Entregador = require('/Entregador');
 
 const Login = sequelize.define('Login', {
-  id_entregador: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    references: {
-      model: Entregador,
-      key: 'id'
+    id_entregador: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        references: {
+            model: Entregador,
+            key: 'id'
+        }
+    },
+    email: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        unique: true,
+        validate: {
+            isEmail: true
+        }
+    },
+    senha: {
+        type: DataTypes.STRING(255),
+        allowNull: false
+    },
+    status: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
     }
-  },
-  email: {
-    type: DataTypes.STRING(255),
-    allowNull: false,
-    unique: true,
-    validate: {
-      isEmail: true
-    }
-  },
-  senha: {
-    type: DataTypes.STRING(255),
-    allowNull: false
-  },
-  status: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: true
-  }
 }, {
-  tableName: 'login',
-  timestamps: false
+    tableName: 'login',
+    timestamps: false
 });
 
 // Definindo a associação
