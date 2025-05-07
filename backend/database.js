@@ -5,12 +5,17 @@ const { Sequelize } = require('sequelize');
 const { USUARIO, HOST, DATABASE, PASSWORD, PORT } = process.env;
 
 // Criando a instância do Sequelize
-const sequelize = new Sequelize(DATABASE, USUARIO, PASSWORD, {
-    host: HOST,
+const sequelize = new Sequelize({
+    database: process.env.DATABASE,
+    username: process.env.USUARIO,
+    password: String(process.env.PASSWORD), // Força conversão para string
+    host: process.env.HOST,
+    port: process.env.PORT,
     dialect: 'postgres',
-    port: PORT,
-    logging: console.log, // Opcional: mostra queries no console
-});
+    dialectOptions: {
+      ssl: false
+    }
+  });
 
 // Testando a conexão
 sequelize.authenticate()
