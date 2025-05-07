@@ -9,7 +9,7 @@ const Entregador = sequelize.define('Entregador', {
     autoIncrement: true
   },
   cnh: {
-    type: DataTypes.CHAR(9),
+    type: DataTypes.CHAR(11),
     allowNull: false,
     unique: true
   },
@@ -21,5 +21,4 @@ const Entregador = sequelize.define('Entregador', {
   tableName: 'entregador',
   timestamps: false // assumindo que não quer created_at e updated_at
 });
-
 module.exports = Entregador;
