@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS login (
     id_entregador INTEGER NOT NULL,
     email VARCHAR(255) NOT NULL,
