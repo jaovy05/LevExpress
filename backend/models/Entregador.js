@@ -1,6 +1,6 @@
     // models/Entregador.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // Ajuste o caminho conforme necessário
+const sequelize = require('../database'); // Ajuste o caminho conforme necessário
 
 const Entregador = sequelize.define('Entregador', {
   id: {
