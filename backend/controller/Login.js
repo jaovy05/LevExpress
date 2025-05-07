@@ -1,6 +1,6 @@
 // controllers/loginController.js
 const Login = require('../models/Login');
-const Entregador = require('./models/Entregador');
+const Entregador = require('../models/Entregador');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -91,17 +91,17 @@ exports.login = async (req, res) => {
     );
 
     res.json({
-      token,
-      entregador: {
-        id: login.Entregador.id,
-        nome: login.Entregador.nome,
-        cnh: login.Entregador.cnh
-      }
+        token,
+        entregador: {
+            id: login.Entregador.id,
+            nome: login.Entregador.nome,
+            cnh: login.Entregador.cnh
+        }
     });
-  } catch (error) {
-    console.error('Erro ao autenticar:', error);
-    res.status(500).json({ error: 'Erro ao autenticar' });
-  }
+    } catch (error) {
+        console.error('Erro ao autenticar:', error);
+        res.status(500).json({ error: 'Erro ao autenticar' });
+    }
 };
 
 // Atualizar credenciais

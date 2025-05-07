@@ -1,7 +1,7 @@
 // models/Login.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const Entregador = require('/Entregador');
+const sequelize = require('../database');
+const Entregador = require('./Entregador');
 
 const Login = sequelize.define('Login', {
     id_entregador: {
