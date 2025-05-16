@@ -53,7 +53,6 @@ exports.findAll = async (req, res) => {
             message: entregadores.length > 0 
                 ? 'Entregadores encontrados' 
                 : 'Nenhum entregador cadastrado',
-            count: entregadores.length,
             data: entregadores
         });
         
