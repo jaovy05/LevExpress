@@ -1,5 +1,5 @@
 // controllers/entregador.js
-const Entregador = require('./models/Entregador');
+const Entregador = require('../models/Entregador.js');
 
 // Criar um novo entregador
 exports.create = async (req, res) => {
@@ -11,8 +11,8 @@ exports.create = async (req, res) => {
             return res.status(400).json({ error: 'CNH e nome são obrigatórios' });
         }
         
-        if (cnh.length !== 9) {
-            return res.status(400).json({ error: 'CNH deve ter exatamente 9 caracteres' });
+        if (cnh.length !== 11) {
+            return res.status(400).json({ error: 'CNH deve ter exatamente 11 caracteres' });
         }
         
         const novoEntregador = await Entregador.create({ cnh, nome });
@@ -64,7 +64,7 @@ exports.update = async (req, res) => {
         }
         
         // Validações
-        if (cnh && cnh.length !== 9) {
+        if (cnh && cnh.length !== 11) {
             return res.status(400).json({ error: 'CNH deve ter exatamente 9 caracteres' });
         }
         
