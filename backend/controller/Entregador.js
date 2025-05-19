@@ -1,47 +1,64 @@
-// controllers/entregador.js
+require('dotenv').config();
+const { Sequelize } = require('sequelize');
+const sequelize = require('../database');
 const Entregador = require('../models/Entregador');
+const Login = require('../models/Login');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-// Criar um novo entregador
+
 exports.create = async (req, res) => {
-    try {
-        const { cnh, nome } = req.body;
-        
-        // Validação simples
-        if (!cnh || !nome) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'CNH e nome são obrigatórios',
-                requiredFields: ['cnh', 'nome']
-            });
-        }
-        
-        if (cnh.length !== 11) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'CNH deve ter exatamente 11 caracteres',
-                invalidField: 'cnh',
-                expectedLength: 11
-            });
-        }
-        
-        const novoEntregador = await Entregador.create({ cnh, nome });
-        
-        res.status(201).json({
-            success: true,
-            message: 'Entregador criado com sucesso',
-            data: novoEntregador
-        });
-        
-    } catch (error) {
-        console.error('Erro ao criar entregador:', error);
-        res.status(500).json({ 
-            success: false,
-            message: 'Erro ao criar entregador',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-            details: process.env.NODE_ENV === 'development' ? { sql: error.sql } : undefined
-        });
+  const t = await sequelize.transaction();
+  try {
+    const { nome, cnh, email, senha } = req.body;
+    if (!nome || !cnh || !email || !senha) {
+      return res.status(400).json({ error: 'nome, cnh, email e senha são obrigatórios' });
     }
+
+    //cria entregador
+    const novoEntregador = await Entregador.create(
+      { nome, cnh },
+      { transaction: t }
+    );
+
+    //cria login vinculado
+    const senhaHash = await bcrypt.hash(senha, 10);
+    await Login.create(
+      {
+        id_entregador: novoEntregador.id,
+        email: email.trim().toLowerCase(),
+        senha: senhaHash,
+        status: true
+      },
+      { transaction: t }
+    );
+
+    //gera JWT
+    const token = jwt.sign(
+      { id_entregador: novoEntregador.id, email },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
+    await t.commit();
+
+    //retorna entregador e token
+    return res.status(201).json({
+      token,
+      entregador: {
+        id: novoEntregador.id,
+        nome: novoEntregador.nome,
+        cnh: novoEntregador.cnh
+      }
+    });
+
+  } catch (error) {
+    await t.rollback();
+    console.error('Erro ao criar entregador + login:', error);
+    return res.status(500).json({ error: 'Erro ao criar entregador com login' });
+  }
 };
+
 
 // Listar todos os entregadores
 exports.findAll = async (req, res) => {

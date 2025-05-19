@@ -1,9 +1,9 @@
 // controllers/loginController.js
+require('dotenv').config();
 const Login = require('../models/Login');
 const Entregador = require('../models/Entregador');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
 // Criar credenciais de login
 exports.create = async (req, res) => {
@@ -64,8 +64,8 @@ exports.login = async (req, res) => {
       where: { email },
       include: [{ model: Entregador }]
     });
-
-    if (!login) {
+      console.log('Login encontrado', login);
+    if (!login ) {
       return res.status(401).json({ error: 'Credenciais inválidas' });
     }
 
@@ -76,10 +76,10 @@ exports.login = async (req, res) => {
 
     // Verificar a senha
     const senhaValida = await bcrypt.compare(senha, login.senha);
+    console.log('Senha válida?', senhaValida);
     if (!senhaValida) {
       return res.status(401).json({ error: 'Credenciais inválidas' });
     }
-
     // Criar token JWT
     const token = jwt.sign(
       { 

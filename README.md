@@ -1,6 +1,6 @@
 # LevExpress
 Aplicativo mobile para entregadores autônomos 
-```markdown
+
 # Nomenclatura e Padrões do Projeto
 
 ## Convenções de Nomenclatura
@@ -41,11 +41,10 @@ Aplicativo mobile para entregadores autônomos
 1. fix: a commit of the type fix patches a bug in your codebase.
 2. feat: a commit of the type feat introduces a new feature to the codebase.
 3. BREAKING CHANGE: a commit that has a footer BREAKING CHANGE:, or appends a ! after the type/scope, introduces a breaking API change. A BREAKING CHANGE can be part of commits of any type.
-```
+
 
 ## Como Contribuir
 1. Crie uma branch seguindo o padrão `nome_da_tarefa_id`
 2. Respeite as convenções de nomenclatura
 3. Mantenha a estrutura MVC
 4. Envie Pull Requests com descrição clara
-```
