@@ -30,15 +30,17 @@ class _LoginFormState extends State<LoginForm> {
 
       try {
         final response = await http.post(
-          Uri.parse('http://192.168.0.105:3000/login'),
+          // Uri.parse('http://192.168.0.105:5000/login'),//uso local
+          Uri.parse('https://b71a-2804-1100-8bf4-3300-35ad-d8b7-6218-da93.ngrok-free.app/login'),//uso ngrok
           headers: {'Content-Type': 'application/json'},
-          body: json.encode({'nome': emailNormalizado, 'senha': _password}),
+          body: json.encode({'email': emailNormalizado, 'senha': _password}),
         );
         if (response.statusCode == 200) {
-          Navigator.pushReplacementNamed(context, '/login');
+          Navigator.pushReplacementNamed(context, '/home');
         } else {
+          final data = json.decode(response.body);
           setState(() {
-            _error = 'Email ou senha incorretos.';
+            _error = data['error'] ?? 'Email ou senha incorretos.';
           });
         }
       } catch (e) {

@@ -33,11 +33,31 @@ class _RegisterFormState extends State<RegisterForm> {
 
       try {
         final response = await http.post(
-          Uri.parse('http://192.168.0.105:3000/register'),
+          // Uri.parse('http://192.168.0.105:5000/entregadores'),//uso local
+          Uri.parse('https://b71a-2804-1100-8bf4-3300-35ad-d8b7-6218-da93.ngrok-free.app/entregadores'),//uso ngrok
           headers: {'Content-Type': 'application/json'},
           body: json.encode({'nome': _name, 'email': emailNormalizado, 'senha': _password, 'cnh': _cnh}),
         );
-        if (response.statusCode == 200) {
+        if (response.statusCode == 201) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+              'Registro realizado com sucesso!',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+              textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            );
+            await Future.delayed(Duration(seconds: 2));
           _loginCadastro();
         } else {
           setState(() {
