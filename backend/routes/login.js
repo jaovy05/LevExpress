@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const login   = require('../controller/Login');
+const login   = require('../controllers/Login');
 
 // Endpoints para criação e autenticação
 router.post('/register', login.create);  // cria as credenciais
