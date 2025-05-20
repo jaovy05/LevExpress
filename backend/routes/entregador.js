@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const entregador = require('../controller/Entregador');
+const entregador = require('../controllers/Entregador');
 
 router.post('/', entregador.create);
 router.get('/', entregador.findAll);
