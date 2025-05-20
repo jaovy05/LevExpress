@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
-import '../AppBackend/RegisterForm.dart';
+import '../AppBackend/login_form.dart';
 
-class Registerscreen extends StatelessWidget {
-  const Registerscreen({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/login');
-          }, 
-          icon: const Icon(Icons.arrow_back, color: Colors.black)
-        ),
         title: const Center(
           child: Text('LevExpress',
             style: TextStyle(
@@ -29,7 +23,7 @@ class Registerscreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            RegisterForm(),
+            LoginForm(),
           ],
         ),
       ),
