@@ -15,13 +15,11 @@ exports.create = async (req, res) => {
       return res.status(400).json({ error: 'nome, cnh, email e senha são obrigatórios' });
     }
 
-    //cria entregador
     const novoEntregador = await Entregador.create(
       { nome, cnh },
       { transaction: t }
     );
 
-    //cria login vinculado
     const senhaHash = await bcrypt.hash(senha, 10);
     await Login.create(
       {
@@ -33,7 +31,6 @@ exports.create = async (req, res) => {
       { transaction: t }
     );
 
-    //gera JWT
     const token = jwt.sign(
       { id_entregador: novoEntregador.id, email },
       process.env.JWT_SECRET,
@@ -42,7 +39,6 @@ exports.create = async (req, res) => {
 
     await t.commit();
 
-    //retorna entregador e token
     return res.status(201).json({
       token,
       entregador: {
@@ -54,8 +50,36 @@ exports.create = async (req, res) => {
 
   } catch (error) {
     await t.rollback();
+    
+    // Tratamento específico para erro de CNH duplicada
+    if (error.name === 'SequelizeUniqueConstraintError' && 
+        error.parent?.constraint === 'entregador_cnh_key') {
+      return res.status(409).json({ 
+        error: 'CNH já cadastrada',
+        message: `A CNH ${req.body.cnh} já está registrada no sistema`,
+        duplicateField: 'cnh',
+        duplicateValue: req.body.cnh,
+        solution: 'Verifique o número da CNH ou entre em contato com o suporte'
+      });
+    }
+
+    // Tratamento específico para erro de email duplicado
+    if (error.name === 'SequelizeUniqueConstraintError' && 
+        (error.parent?.constraint === 'login_email_key' || error.parent?.constraint === 'email_unique')) {
+      return res.status(409).json({ 
+        error: 'Email já cadastrado',
+        message: `O email ${req.body.email} já está registrado no sistema`,
+        duplicateField: 'email',
+        duplicateValue: req.body.email,
+        solution: 'Tente fazer login ou recuperar sua senha'
+      });
+    }
+
     console.error('Erro ao criar entregador + login:', error);
-    return res.status(500).json({ error: 'Erro ao criar entregador com login' });
+    return res.status(500).json({ 
+      error: 'Erro ao criar conta',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 

@@ -12,18 +12,22 @@ class LoginForm extends StatefulWidget {
 
 class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
-  String _email = '';
-  String _password = '';
-  // ignore: unused_field
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  
   bool _loading = false;
-  // ignore: unused_field
   String? _error;
   bool _obscureText = true;
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final emailNormalizado = _email.trim().toLowerCase();
       setState(() {
         _loading = true;
         _error = null;
@@ -31,39 +35,182 @@ class LoginFormState extends State<LoginForm> {
 
       try {
         final response = await http.post(
-          // Uri.parse('http://192.168.0.105:5000/login'),//uso local
-          Uri.parse('$apiBaseUrl/login'), // uso ngrok/config
+          Uri.parse('$apiBaseUrl/login'),
           headers: {'Content-Type': 'application/json'},
-          body: json.encode({'email': emailNormalizado, 'senha': _password}),
+          body: json.encode({
+            'email': _emailController.text.trim().toLowerCase(),
+            'senha': _passwordController.text
+          }),
         );
+
         if (response.statusCode == 200) {
           if (!mounted) return;
           Navigator.pushReplacementNamed(context, '/home');
         } else {
-          final data = json.decode(response.body);
+          final errorData = json.decode(response.body);
+          String errorMessage = 'Email ou senha incorretos';
+          
+          if (response.statusCode == 400 || response.statusCode == 401) {
+            if (errorData['message']?.contains('bloqueado') ?? false) {
+              errorMessage = 'Conta bloqueada. Entre em contato com o suporte.';
+            } else if (errorData['message']?.contains('inativo') ?? false) {
+              errorMessage = 'Conta inativa. Entre em contato com o suporte.';
+            } else if (errorData['message']?.contains('senha') ?? false) {
+              errorMessage = 'Senha incorreta. Por favor, tente novamente.';
+            } else if (errorData['message']?.contains('email') ?? false) {
+              errorMessage = 'Email não cadastrado. Verifique ou crie uma conta.';
+            }
+          }
+
           setState(() {
-            _error = data['error'] ?? 'Email ou senha incorretos.';
+            _error = errorMessage;
           });
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(errorMessage),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
         }
       } catch (e) {
         setState(() {
-          _error = 'Erro ao conectar com o servidor.';
+          _error = 'Erro ao conectar com o servidor';
         });
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao conectar com o servidor'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
       } finally {
-        setState(() {
-          _loading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _loading = false;
+          });
+        }
       }
     }
   }
 
-  void _cadastro() {
+  void _navigateToRegister() {
     Navigator.pushReplacementNamed(context, '/register');
   }
 
-  // TO DO
-  void _toBeDone() {
-    Navigator.pushReplacementNamed(context, '/passwordReset');
+  Widget _buildEmailField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Email',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _emailController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: 'Digite seu email',
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Por favor, insira um email válido';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Senha',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _passwordController,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: 'Digite sua senha',
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureText ? Icons.visibility_off : Icons.visibility,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            ),
+          ),
+          obscureText: _obscureText,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Por favor, insira sua senha';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return OutlinedButton(
+      onPressed: _loading ? null : _login,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        backgroundColor: const Color.fromARGB(255, 3, 74, 131),
+        minimumSize: const Size.fromHeight(50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      ),
+      child: _loading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            )
+          : const Text(
+              'Entrar',
+              style: TextStyle(color: Colors.white),
+            ),
+    );
+  }
+
+  Widget _buildRegisterLink() {
+    return Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Não tem conta ainda?',
+            style: TextStyle(color: Colors.black),
+          ),
+          TextButton(
+            onPressed: _navigateToRegister,
+            child: const Text(
+              'Criar conta',
+              style: TextStyle(color: Color.fromARGB(255, 3, 74, 131)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -72,126 +219,37 @@ class LoginFormState extends State<LoginForm> {
       padding: const EdgeInsets.all(16.0),
       child: Form(
         key: _formKey,
-        child: Column(
+        child: SingleChildScrollView(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-            Text(
-              'Entrar',
-              style: TextStyle(
-              fontSize: 28,
-              color: const Color.fromARGB(255, 0, 0, 0),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Text(
-              'Email',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              TextFormField(
-              decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Digite seu email',
-              ),
-              validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor, insira um email válido';
-              }
-              return null;
-              },
-              onSaved: (value) => _email = value!,
-              ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Text(
-              'Senha',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              TextFormField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Senha',
-                suffixIcon: IconButton(
-                icon: Icon(
-                _obscureText ? Icons.visibility_off : Icons.visibility,
+              const Text(
+                'Entrar',
+                style: TextStyle(
+                  fontSize: 28,
+                  color: Colors.black,
                 ),
-                onPressed: () {
-                setState(() {
-                _obscureText = !_obscureText;
-                });
-                },
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              _buildEmailField(),
+              const SizedBox(height: 16),
+              _buildPasswordField(),
+              const SizedBox(height: 18),
+              _buildLoginButton(),
+              const SizedBox(height: 16),
+              _buildRegisterLink(),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              obscureText: _obscureText,
-              validator: (value) {
-                if (value == null || value.isEmpty || value.length < 6) {
-                return 'A senha deve ter pelo menos 6 caracteres';
-                }
-                return null;
-              },
-              onSaved: (value) => _password = value!,
-              ),
-              SizedBox(height: 8),
-              TextButton(
-              onPressed: _toBeDone,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                'Esqueci minha senha',
-                style: TextStyle(color: const Color.fromARGB(255, 3, 74, 131)),
-                ),
-              ),
-              ),
-              ],
-              ),
-            ),
-            OutlinedButton(
-              onPressed: _login,
-              style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: const Color.fromARGB(255, 3, 74, 131),
-              minimumSize: const Size.fromHeight(50), // Faz o botão ocupar toda a largura disponível
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)
-              ),
-              child: Text('Entrar', style: TextStyle(color: Colors.white)),
-            ),
-            Center(
-              child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                'Não tem conta ainda ?',
-                style: TextStyle(color: Colors.black),
-                ),
-                TextButton(
-                onPressed: _cadastro,
-                child: Text(
-                  'Criar conta',
-                  style: TextStyle(color: const Color.fromARGB(255, 3, 74, 131)),
-                ),
-                ),
-              ],
-              ),
-            ),
-            if (_error != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Text(
-                  _error!,
-                  style: TextStyle(color: Colors.red, fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

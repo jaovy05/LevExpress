@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'api_config.dart';
@@ -7,79 +8,345 @@ class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _RegisterFormState createState() => _RegisterFormState();
+  RegisterFormState createState() => RegisterFormState();
 }
 
-class _RegisterFormState extends State<RegisterForm> {
+class RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  String _email = '';
-  String _password = '';
-  String _cnh = '';
-  // ignore: unused_field
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _cnhController = TextEditingController();
+
   bool _loading = false;
-  // ignore: unused_field
   String? _error;
   bool _obscureText = true;
+  bool _obscureConfirmText = true;
 
-  Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final emailNormalizado = _email.trim().toLowerCase();
-      setState(() {
-        _loading = true;
-        _error = null;
-      });
+  // Constantes para strings
+  static const _registerTitle = 'Registre-se';
+  static const _nameLabel = 'Nome';
+  static const _nameHint = 'Digite seu nome completo';
+  static const _emailLabel = 'Email';
+  static const _emailHint = 'Digite seu email';
+  static const _passwordLabel = 'Senha';
+  static const _passwordHint = 'Senha';
+  static const _confirmPasswordLabel = 'Confirmar Senha';
+  static const _confirmPasswordHint = 'Confirme sua senha';
+  static const _cnhLabel = 'CNH';
+  static const _cnhHint = 'Digite o número da sua CNH';
+  static const _registerButton = 'Registrar';
+  static const _loginText = 'Já tem uma conta? Faça login';
 
-      try {
-        final response = await http.post(
-          // Uri.parse('http://192.168.0.105:5000/entregadores'),//uso local
-          Uri.parse('$apiBaseUrl/entregadores'), // uso ngrok/config
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({'nome': _name, 'email': emailNormalizado, 'senha': _password, 'cnh': _cnh}),
-        );
-        if (response.statusCode == 201) {
-            if (!mounted) return;
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => Center(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-              'Registro realizado com sucesso!',
-              style: TextStyle(color: Colors.white, fontSize: 18),
-              textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            );
-            await Future.delayed(Duration(seconds: 2));
-          _loginCadastro();
-        } else {
-          setState(() {
-            _error = 'Dados incorretos.';
-          });
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _cnhController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _register() async {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('$apiBaseUrl/entregadores'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'nome': _nameController.text.trim(),
+          'email': _emailController.text.trim().toLowerCase(),
+          'senha': _passwordController.text,
+          'cnh': _cnhController.text
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        if (!mounted) return;
+        _showSuccessDialog();
+      } else {
+        final errorData = json.decode(response.body);
+        String errorMessage = 'Erro ao realizar o registro';
+        
+        // Tratamento específico para CNH duplicada
+        if (response.statusCode == 400 || response.statusCode == 409) {
+          if (errorData['message']?.contains('CNH') ?? false) {
+            errorMessage = 'CNH já cadastrada. Por favor, verifique o número ou recupere sua conta.';
+          } else if (errorData['message']?.contains('email') ?? false) {
+            errorMessage = 'Email já cadastrado. Por favor, use outro email ou faça login.';
+          }
         }
-      } catch (e) {
+
         setState(() {
-          _error = 'Erro ao conectar com o servidor.';
+          _error = errorMessage;
         });
-      } finally {
+        
+        // Mostra um SnackBar com a mensagem de erro
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      String errorMessage = 'Erro ao conectar com o servidor';
+
+      setState(() {
+        _error = errorMessage;
+      });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
         setState(() {
           _loading = false;
         });
       }
     }
   }
+}
 
-  void _loginCadastro() {
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Sucesso'),
+        content: const Text('Registro realizado com sucesso!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _navigateToLogin();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToLogin() {
     Navigator.pushReplacementNamed(context, '/login');
+  }
+
+  Widget _buildNameField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _nameLabel,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _nameController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: _nameHint,
+          ),
+          textCapitalization: TextCapitalization.words,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Por favor, insira um nome válido';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmailField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _emailLabel,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _emailController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: _emailHint,
+          ),
+          keyboardType: TextInputType.emailAddress,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Por favor, insira um email válido';
+            }
+            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              return 'Por favor, insira um email válido';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _passwordLabel,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _passwordController,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: _passwordHint,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureText ? Icons.visibility_off : Icons.visibility,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            ),
+          ),
+          obscureText: _obscureText,
+          validator: (value) {
+            if (value == null || value.isEmpty || value.length < 6) {
+              return 'A senha deve ter pelo menos 6 caracteres';
+            }
+            if (!RegExp(r'[A-Z]').hasMatch(value)) {
+              return 'A senha deve conter pelo menos uma letra maiúscula';
+            }
+            if (!RegExp(r'[0-9]').hasMatch(value)) {
+              return 'A senha deve conter pelo menos um número';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildConfirmPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _confirmPasswordLabel,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _confirmPasswordController,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: _confirmPasswordHint,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureConfirmText ? Icons.visibility_off : Icons.visibility,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureConfirmText = !_obscureConfirmText;
+                });
+              },
+            ),
+          ),
+          obscureText: _obscureConfirmText,
+          validator: (value) {
+            if (value != _passwordController.text) {
+              return 'As senhas não coincidem';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCnhField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _cnhLabel,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _cnhController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: _cnhHint,
+          ),
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          validator: (value) {
+            if (value == null || value.isEmpty || value.length != 11) {
+              return 'Por favor, insira um número de CNH válido';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginLink() {
+    return TextButton(
+      onPressed: _navigateToLogin,
+      child: const Text(
+        _loginText,
+        style: TextStyle(color: Colors.blue),
+      ),
+    );
+  }
+
+  Widget _buildRegisterButton() {
+    return OutlinedButton(
+      onPressed: _loading ? null : _register,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        backgroundColor: const Color.fromARGB(255, 3, 74, 131),
+        minimumSize: const Size.fromHeight(50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      ),
+      child: _loading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            )
+          : Text(
+              _registerButton,
+              style: const TextStyle(color: Colors.white),
+            ),
+    );
   }
 
   @override
@@ -88,145 +355,45 @@ class _RegisterFormState extends State<RegisterForm> {
       padding: const EdgeInsets.all(16.0),
       child: Form(
         key: _formKey,
-        child: Column(
+        child: SingleChildScrollView(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-            Text(
-              'Registre-se',
-              style: TextStyle(
-              fontSize: 28,
-              color: const Color.fromARGB(255, 0, 0, 0),
-              ),
-              textAlign: TextAlign.center,
-            ),
-                      const SizedBox(height: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
               Text(
-              'Nome',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              TextFormField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Digite seu nome completo',
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor, insira um nome válido';
-                }
-                return null;
-              },
-              onSaved: (value) => _name = value!,
-              ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Text(
-              'Email',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              TextFormField(
-              decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Digite seu email',
-              ),
-              validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor, insira um email válido';
-              }
-              return null;
-              },
-              onSaved: (value) => _email = value!,
-              ),
-              ],
-            ),
-            Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-            Text(
-            'Senha',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            TextFormField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Senha',
-              suffixIcon: IconButton(
-              icon: Icon(
-              _obscureText ? Icons.visibility_off : Icons.visibility,
-              ),
-              onPressed: () {
-              setState(() {
-              _obscureText = !_obscureText;
-              });
-              },
-              ),
-            ),
-            obscureText: _obscureText,
-            validator: (value) {
-              if (value == null || value.isEmpty || value.length < 6) {
-              return 'A senha deve ter pelo menos 6 caracteres';
-              }
-              return null;
-            },
-            onSaved: (value) => _password = value!,
-            ),
-            ],
-            ),
-            Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-            Text('CNH',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            TextFormField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Digite o número da sua CNH',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty || value.length != 11) {
-                return 'Por favor, insira um número de CNH válido';
-              }
-              return null;
-            },
-            onSaved: (value) => _cnh = value!,
-            ),
-            ],
-            ),
-            SizedBox(height: 18),
-            OutlinedButton(
-              onPressed: _login,
-              style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: const Color.fromARGB(255, 3, 74, 131),
-              minimumSize: const Size.fromHeight(50), // Faz o botão ocupar toda a largura disponível
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)
-              ),
-              child: Text('Registrar', style: TextStyle(color: Colors.white)),
-            ),
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Text(
-                _error!,
-                style: TextStyle(color: Colors.red, fontSize: 16),
+                _registerTitle,
+                style: const TextStyle(
+                  fontSize: 28,
+                  color: Colors.black,
+                ),
                 textAlign: TextAlign.center,
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              _buildNameField(),
+              const SizedBox(height: 16),
+              _buildEmailField(),
+              const SizedBox(height: 16),
+              _buildPasswordField(),
+              const SizedBox(height: 16),
+              _buildConfirmPasswordField(),
+              const SizedBox(height: 16),
+              _buildCnhField(),
+              const SizedBox(height: 18),
+              _buildRegisterButton(),
+              const SizedBox(height: 8),
+              _buildLoginLink(),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
-
