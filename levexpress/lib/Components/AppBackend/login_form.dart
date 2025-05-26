@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'api_config.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
   @override
-  _LoginFormState createState() => _LoginFormState();
+  LoginFormState createState() => LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
@@ -31,11 +32,12 @@ class _LoginFormState extends State<LoginForm> {
       try {
         final response = await http.post(
           // Uri.parse('http://192.168.0.105:5000/login'),//uso local
-          Uri.parse('https://b71a-2804-1100-8bf4-3300-35ad-d8b7-6218-da93.ngrok-free.app/login'),//uso ngrok
+          Uri.parse('$apiBaseUrl/login'), // uso ngrok/config
           headers: {'Content-Type': 'application/json'},
           body: json.encode({'email': emailNormalizado, 'senha': _password}),
         );
         if (response.statusCode == 200) {
+          if (!mounted) return;
           Navigator.pushReplacementNamed(context, '/home');
         } else {
           final data = json.decode(response.body);
@@ -180,6 +182,15 @@ class _LoginFormState extends State<LoginForm> {
               ],
               ),
             ),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  _error!,
+                  style: TextStyle(color: Colors.red, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
           ],
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../AppBackend/RegisterForm.dart';
+import '../AppBackend/register_form.dart';
 
 class Registerscreen extends StatelessWidget {
   const Registerscreen({super.key});
@@ -25,12 +25,14 @@ class Registerscreen extends StatelessWidget {
         )
 
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RegisterForm(),
-          ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RegisterForm(),
+            ],
+          ),
         ),
       ),
     );

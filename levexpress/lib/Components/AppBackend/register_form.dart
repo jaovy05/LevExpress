@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'api_config.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -34,11 +35,12 @@ class _RegisterFormState extends State<RegisterForm> {
       try {
         final response = await http.post(
           // Uri.parse('http://192.168.0.105:5000/entregadores'),//uso local
-          Uri.parse('https://b71a-2804-1100-8bf4-3300-35ad-d8b7-6218-da93.ngrok-free.app/entregadores'),//uso ngrok
+          Uri.parse('$apiBaseUrl/entregadores'), // uso ngrok/config
           headers: {'Content-Type': 'application/json'},
           body: json.encode({'nome': _name, 'email': emailNormalizado, 'senha': _password, 'cnh': _cnh}),
         );
         if (response.statusCode == 201) {
+            if (!mounted) return;
             showDialog(
               context: context,
               barrierDismissible: false,
@@ -210,6 +212,15 @@ class _RegisterFormState extends State<RegisterForm> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)
               ),
               child: Text('Registrar', style: TextStyle(color: Colors.white)),
+            ),
+          if (_error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Text(
+                _error!,
+                style: TextStyle(color: Colors.red, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
