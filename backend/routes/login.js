@@ -1,12 +1,12 @@
 const express = require('express');
 const router  = express.Router();
-const login   = require('../controller/Login');
+const Login = require('../controllers/Login');
 
 // Endpoints para criação e autenticação
-router.post('/register', login.create);  // cria as credenciais
-router.post('/',          login.login);   // autentica (gera JWT)
-router.put('/login/:id',       login.update);  // atualiza credenciais
-router.get('/login/:id',       login.findOne); // busca dados de login
+router.post('/register', Login.create);  // cria as credenciais
+router.post('/',         Login.login);   // autentica (gera JWT)
+router.put('/login/:id', Login.update);  // atualiza credenciais
+router.get('/login/:id', Login.findOne); // busca dados de login
 
 module.exports = router;
 

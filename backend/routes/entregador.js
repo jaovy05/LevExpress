@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const entregador = require('../controller/Entregador');
+const Entregador = require('../controllers/Entregador');
 
-router.post('/', entregador.create);
-router.get('/', entregador.findAll);
-router.get('/:id', entregador.findOne);
-router.put('/:id', entregador.update);
-router.delete('/:id', entregador.delete);
+router.post('/',      Entregador.create);
+router.get('/',       Entregador.findAll);
+router.get('/:id',    Entregador.findOne);
+router.put('/:id',    Entregador.update);
+router.delete('/:id', Entregador.delete);
 
 module.exports = router;
