@@ -22,7 +22,6 @@ class api_map_state extends State<api_map> {
       body: Column(
         children: [
           Expanded(
-            child: FlutterMap(
               options: MapOptions(
                 center: LatLng(-27.0968, -52.6186), // Localização inicial
                 zoom: 12.0,
