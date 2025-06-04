@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:levexpress/Components/AppFrontend/Plus_button.dart';
 import '../AppBackend/LoginForm.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -26,12 +25,6 @@ class LoginScreen extends StatelessWidget {
             LoginForm(),
           ],
         ),
-      ),
-      floatingActionButton: PlusButton(
-        onPressed: () {
-          // Exemplo: navegar para a tela de registro
-          Navigator.pushNamed(context, '/register');
-        },
       ),
     );
   }
