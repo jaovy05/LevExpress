@@ -27,12 +27,6 @@ class LoginScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: PlusButton(
-        onPressed: () {
-          // Exemplo: navegar para a tela de registro
-          Navigator.pushNamed(context, '/register');
-        },
-      ),
     );
   }
 }
