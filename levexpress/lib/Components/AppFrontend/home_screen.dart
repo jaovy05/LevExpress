@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../AppBackend/api_map.dart';
+import 'Plus_button.dart';
 
 class home_screen extends StatelessWidget {
   const home_screen({super.key});
@@ -26,9 +27,23 @@ class home_screen extends StatelessWidget {
             Expanded(
               child: Padding(
               padding: const EdgeInsets.all(5.0),
-              child: Center(
-                child: api_map(), // Chama a função api_map para exibir o mapa
-              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: api_map(), // Chama a função api_map para exibir o mapa
+                  ),
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: PlusButton(
+                      onPressed: () {
+                        // Exemplo: navegar para a tela de registro
+                        Navigator.pushNamed(context, '/register');
+                      },
+                    ),
+                  ) 
+                ],
+              )
               ),
             ),
           ],
