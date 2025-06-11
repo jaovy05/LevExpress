@@ -2,3 +2,11 @@ yarn.lock
 .env
 node_modules/
 package-lock.json
+levexpress/linux/flutter/generated_plugin_registrant.cc
+levexpress/linux/flutter/generated_plugin_registrant.h
+levexpress/linux/flutter/generated_plugins.cmake
+levexpress/macos/Flutter/GeneratedPluginRegistrant.swift
+levexpress/windows/flutter/generated_plugin_registrant.cc
+levexpress/windows/flutter/generated_plugin_registrant.h
+levexpress/windows/flutter/generated_plugins.cmake
+levexpress/lib/Components/AppBackend/api_config.dart
