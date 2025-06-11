@@ -32,10 +32,10 @@ dependencies:
     sdk: flutter
   http: ^1.3.0
   flutter_dotenv: ^5.1.0
-  flutter_map: ^6.0.0
-  geolocator: ^9.0.2 # Para obter a localização do usuário
+  flutter_map: ^8.1.1
+  geolocator: ^14.0.1 # Para obter a localização do usuário
   latlong2: ^0.9.0 # Para trabalhar com coordenadas
-  flutter_keyboard_visibility: ^5.4.1 # Para detectar a visibilidade do teclado
+  flutter_keyboard_visibility: ^6.0.0 # Para detectar a visibilidade do teclado
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
