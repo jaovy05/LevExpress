@@ -15,16 +15,14 @@ class HomeScreen extends StatelessWidget {
     Navigator.pushNamed(context, '/listar-pacotes');
   }
 
+  void _logout(BuildContext context) {
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-        Navigator.pushReplacementNamed(context, '/login');
-          },
-        ),
         title: const Text('LevExpress'),
         centerTitle: true,
       ),
@@ -45,8 +43,7 @@ class HomeScreen extends StatelessWidget {
                     right: 16,
                     child: PlusButton(
                       onPressed: () {
-                        // Exemplo: navegar para a tela de registro
-                        Navigator.pushNamed(context, '/register');
+                        Navigator.pushNamed(context, '/cadastrar-pacote');
                       },
                     ),
                   ) 
@@ -58,44 +55,59 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
           children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 3, 74, 131),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Icon(Icons.menu, color: Colors.white, size: 40),
-                  SizedBox(height: 12),
-                  Text(
-                    'Menu',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  DrawerHeader(
+                    decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 3, 74, 131),
                     ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Icon(Icons.menu, color: Colors.white, size: 40),
+                        SizedBox(height: 12),
+                        Text(
+                          'Menu',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.add_box),
+                    title: const Text('Cadastrar Pacote'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToCadastroPacote(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.list_alt),
+                    title: const Text('Listar Pacotes'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _navigateToListarPacotes(context);
+                    },
                   ),
                 ],
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.add_box),
-              title: const Text('Cadastrar Pacote'),
-              onTap: () {
-                Navigator.pop(context);
-                _navigateToCadastroPacote(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.list_alt),
-              title: const Text('Listar Pacotes'),
-              onTap: () {
-                Navigator.pop(context);
-                _navigateToListarPacotes(context);
-              },
+            // Botão Sair na parte inferior do Drawer
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: ListTile(
+                leading: const Icon(Icons.exit_to_app, color: Colors.red),
+                title: const Text('Sair', style: TextStyle(color: Colors.red)),
+                onTap: () => _logout(context),
+              ),
             ),
           ],
         ),
