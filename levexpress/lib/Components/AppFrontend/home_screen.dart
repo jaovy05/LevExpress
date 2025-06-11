@@ -7,14 +7,6 @@ import '../Utils/plus_button.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void _navigateToCadastroPacote(BuildContext context) {
-    Navigator.pushNamed(context, '/cadastrar-pacote');
-  }
-
-  void _navigateToListarPacotes(BuildContext context) {
-    Navigator.pushNamed(context, '/listar-pacotes');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,17 +47,6 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-      body: const Center(
-        child: Text(
-          'Bem-vindo ao LevExpress!',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 3, 74, 131),
-          ),
-          textAlign: TextAlign.center,
         ),
       ),
     );

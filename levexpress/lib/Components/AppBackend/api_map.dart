@@ -24,8 +24,8 @@ class api_map_state extends State<api_map> {
           Expanded(
             child: FlutterMap(
               options: MapOptions(
-                center: LatLng(-27.0968, -52.6186), // Localização inicial
-                zoom: 12.0,
+                initialCenter: LatLng(-27.0968, -52.6186), // Localização inicial (atualizado)
+                initialZoom: 12.0, // Use initialZoom em vez de zoom
               ),
               children: [
                 TileLayer(
