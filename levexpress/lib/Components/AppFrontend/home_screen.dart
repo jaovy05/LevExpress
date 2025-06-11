@@ -1,4 +1,8 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
+import '../AppBackend/api_map.dart';
+import '../Utils/plus_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -15,56 +19,40 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'LevExpress',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 186, 5, 5),
-            ),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+        Navigator.pushReplacementNamed(context, '/login');
+          },
         ),
+        title: const Text('LevExpress'),
+        centerTitle: true,
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 3, 74, 131),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Icon(Icons.menu, color: Colors.white, size: 40),
-                  SizedBox(height: 12),
-                  Text(
-                    'Menu',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold
-                    ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+            Expanded(
+              child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Stack(
+                children: [
+                  Center(
+                    child: api_map(), // Chama a função api_map para exibir o mapa
                   ),
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: PlusButton(
+                      onPressed: () {
+                        // Exemplo: navegar para a tela de registro
+                        Navigator.pushNamed(context, '/register');
+                      },
+                    ),
+                  ) 
                 ],
+              )
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.add_box),
-              title: const Text('Cadastrar Pacote'),
-              onTap: () {
-                Navigator.pop(context);
-                _navigateToCadastroPacote(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.list_alt),
-              title: const Text('Listar Pacotes'),
-              onTap: () {
-                Navigator.pop(context);
-                _navigateToListarPacotes(context);
-              },
             ),
           ],
         ),
