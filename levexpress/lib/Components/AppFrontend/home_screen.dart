@@ -3,20 +3,46 @@
 import 'package:flutter/material.dart';
 import '../AppBackend/api_map.dart';
 import '../Utils/plus_button.dart';
+import '../AppBackend/listar_datas_entregas.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  void _navigateToCadastroPacote(BuildContext context) {
-    Navigator.pushNamed(context, '/cadastrar-pacote');
-  }
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-  void _navigateToListarPacotes(BuildContext context) {
-    Navigator.pushNamed(context, '/listar-pacotes');
-  }
+class _HomeScreenState extends State<HomeScreen> {
+  DateTime? selectedDate;
 
-  void _logout(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/login');
+  void _navigateToCadastroPacote(BuildContext context) async {
+    final selectedDate = await showDialog<DateTime>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Iniciar Rota'),
+          content: const ListarDatasEntregas(),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedDate != null) {
+      setState(() {
+        this.selectedDate = selectedDate;
+      });
+    }
   }
 
   @override
@@ -29,26 +55,50 @@ class HomeScreen extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+          children: <Widget>[
             Expanded(
               child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Stack(
-                children: [
-                  Center(
-                    child: api_map(), // Chama a função api_map para exibir o mapa
-                  ),
-                  Positioned(
-                    bottom: 16,
-                    right: 16,
-                    child: PlusButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/cadastrar-pacote');
-                      },
+                padding: const EdgeInsets.all(5.0),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: api_map(date: selectedDate), // Passe a data aqui
                     ),
-                  ) 
-                ],
-              )
+                    Positioned(
+                      bottom: 20,
+                      left: 16,
+                      child: SizedBox(
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: () => _navigateToCadastroPacote(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color.fromARGB(255, 236, 237, 238),
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            elevation: 6,
+                          ),
+                          child: const Text(
+                            'Iniciar Rota',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      right: 16,
+                      child: PlusButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/cadastrar-pacote');
+                        },
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ],
@@ -86,7 +136,7 @@ class HomeScreen extends StatelessWidget {
                     title: const Text('Cadastrar Pacote'),
                     onTap: () {
                       Navigator.pop(context);
-                      _navigateToCadastroPacote(context);
+                      Navigator.pushNamed(context, '/cadastrar-pacote');
                     },
                   ),
                   ListTile(
@@ -94,19 +144,20 @@ class HomeScreen extends StatelessWidget {
                     title: const Text('Listar Pacotes'),
                     onTap: () {
                       Navigator.pop(context);
-                      _navigateToListarPacotes(context);
+                      Navigator.pushNamed(context, '/listar-pacotes');
                     },
                   ),
                 ],
               ),
             ),
-            // Botão Sair na parte inferior do Drawer
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: ListTile(
                 leading: const Icon(Icons.exit_to_app, color: Colors.red),
                 title: const Text('Sair', style: TextStyle(color: Colors.red)),
-                onTap: () => _logout(context),
+                onTap: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
               ),
             ),
           ],
