@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../AppBackend/listar_pacotes_list.dart';
+import '../../core/app_cores.dart';
 
 class ListarPacotesScreen extends StatelessWidget {
   const ListarPacotesScreen({super.key});
@@ -8,7 +9,9 @@ class ListarPacotesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Listar Pacotes'),
+        backgroundColor: AppCores.appBarBackground,
+        title: const Text('Listar Pacotes',
+            style: TextStyle(color: AppCores.appBarTitle, fontFamily: 'Montserrat')),
       ),
       body: const ListarPacotesList(),
     );

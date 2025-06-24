@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../AppBackend/api_map.dart';
 import '../Utils/plus_button.dart';
 import '../AppBackend/listar_datas_entregas.dart';
+import '../../core/app_cores.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _navigateToCadastroPacote(BuildContext context) async {
     setState(() {
-      selectedDate = null; // Limpa a data selecionada
+      selectedDate = null;
     });
     final DateTime? pickedDate = await showDialog<DateTime>(
       context: context,
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title: const Text('Iniciar Rota'),
           content: SizedBox(
             width: double.maxFinite,
-            height: 400, // defina uma altura máxima para o ListView
+            height: 400,
             child: const ListarDatasEntregas(),
           ),
           actions: [
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Stack(
                   children: [
                     Center(
-                      child: api_map(date: selectedDate), // Passe a data aqui
+                      child: api_map(date: selectedDate),
                     ),
                     Positioned(
                       bottom: 20,
@@ -101,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: PlusButton(
                         onPressed: () {
                           setState(() {
-                            selectedDate = null; // Limpa a data selecionada
+                            selectedDate = null;
                           });
                           Navigator.pushNamed(context, '/cadastrar-pacote');
                         },
@@ -115,64 +116,133 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       drawer: Drawer(
+        backgroundColor: AppCores.drawerBackground,
         child: Column(
           children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+              decoration: const BoxDecoration(
+                color: AppCores.appBarBackground,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, color: AppCores.drawerBackground, size: 40),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Text(
+                      'LevExpress',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  DrawerHeader(
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 3, 74, 131),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Icon(Icons.menu, color: Colors.white, size: 40),
-                        SizedBox(height: 12),
-                        Text(
-                          'Menu',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ],
-                    ),
+                  _DrawerMenuItem(
+                    icon: Icons.home,
+                    label: 'Início',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushReplacementNamed(context, '/home');
+                    },
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.add_box),
-                    title: const Text('Cadastrar Pacote'),
+                  _DrawerMenuItem(
+                    icon: Icons.add_box,
+                    label: 'Cadastrar Pacote',
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.pushNamed(context, '/cadastrar-pacote');
                     },
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.list_alt),
-                    title: const Text('Listar Pacotes'),
+                  _DrawerMenuItem(
+                    icon: Icons.list_alt,
+                    label: 'Listar Pacotes',
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.pushNamed(context, '/listar-pacotes');
                     },
                   ),
+                  const Divider(
+                    color: AppCores.inputBorder,
+                    height: 32,
+                    thickness: 1,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: ListTile(
-                leading: const Icon(Icons.exit_to_app, color: Colors.red),
-                title: const Text('Sair', style: TextStyle(color: Colors.red)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: _DrawerMenuItem(
+                icon: Icons.exit_to_app,
+                label: 'Sair',
                 onTap: () {
                   Navigator.pushReplacementNamed(context, '/login');
                 },
+                color: AppCores.error,
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DrawerMenuItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+
+  const _DrawerMenuItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(icon, color: color ?? AppCores.drawerIcon),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: color ?? AppCores.drawerItemText,
+          fontFamily: 'Montserrat',
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+      onTap: onTap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      hoverColor: (color ?? AppCores.buttonBackground).withAlpha((0.08 * 255).toInt()),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      minLeadingWidth: 0,
     );
   }
 }

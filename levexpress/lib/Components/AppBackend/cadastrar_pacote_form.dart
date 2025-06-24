@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
+import '../../core/app_cores.dart';
 
 class CadastrarPacoteForm extends StatefulWidget {
   const CadastrarPacoteForm({super.key});
@@ -382,11 +383,6 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Cadastro de Pacote',
-              style: TextStyle(fontSize: 28, color: Colors.black),
-              textAlign: TextAlign.center,
-            ),
             const SizedBox(height: 20),
             TextFormField(
               controller: _nrPacoteController,
@@ -394,8 +390,11 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                 border: OutlineInputBorder(),
                 labelText: 'Número do Pacote',
                 hintText: 'Digite o número identificador do pacote',
+                labelStyle: TextStyle(color: AppCores.inputLabel),
+                hintStyle: TextStyle(color: AppCores.inputHint),
               ),
               keyboardType: TextInputType.number,
+              style: const TextStyle(color: AppCores.inputLabel),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Informe o número do pacote';
@@ -413,7 +412,10 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                 border: OutlineInputBorder(),
                 labelText: 'Empresa de Origem',
                 hintText: 'Digite a empresa de origem',
+                labelStyle: TextStyle(color: AppCores.inputLabel),
+                hintStyle: TextStyle(color: AppCores.inputHint),
               ),
+              style: const TextStyle(color: AppCores.inputLabel),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Informe a empresa de origem';
@@ -428,12 +430,15 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                 border: const OutlineInputBorder(),
                 labelText: 'Endereço de Entrega',
                 hintText: 'Digite o endereço de entrega',
+                labelStyle: const TextStyle(color: AppCores.inputLabel),
+                hintStyle: const TextStyle(color: AppCores.inputHint),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.map),
+                  icon: const Icon(Icons.map, color: AppCores.inputLabel),
                   tooltip: 'Buscar no mapa',
                   onPressed: () => _abrirBuscaEnderecoNoMapa(context),
                 ),
               ),
+              style: const TextStyle(color: AppCores.inputLabel),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Informe o endereço de entrega';
@@ -446,9 +451,7 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                   setState(() => _sugestoesEndereco = []);
                   return;
                 }
-                _debounceEndereco = Timer(const Duration(milliseconds: 600), () {
-                  _mostrarSugestoesEndereco(context, value);
-                });
+                _mostrarSugestoesEndereco(context, value);
               },
             ),
             if (_sugestoesEndereco.isNotEmpty)
@@ -456,27 +459,41 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                 margin: const EdgeInsets.only(top: 2),
                 constraints: const BoxConstraints(maxHeight: 220),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.black12),
+                  color: AppCores.cardBackground,
+                  border: Border.all(color: AppCores.inputBorder),
                   borderRadius: BorderRadius.circular(4),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
+                      color: AppCores.inputBorder.withAlpha((0.1 * 255).toInt()),
                       blurRadius: 4,
                       offset: Offset(0, 2),
                     ),
                   ],
                 ),
-                child: ListView.builder(
+                child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: _sugestoesEndereco.length,
+                  separatorBuilder: (context, index) => Divider(
+                    color: AppCores.inputBorder,
+                    height: 1,
+                    thickness: 1,
+                    indent: 8,
+                    endIndent: 8,
+                  ),
                   itemBuilder: (context, index) {
                     final item = _sugestoesEndereco[index];
                     final address = item['address'] ?? {};
                     final displayName = item['display_name'] as String?;
                     final enderecoFormatado = _formatarEnderecoSugestao(address, displayName);
                     return ListTile(
-                      title: Text(enderecoFormatado),
+                      title: Text(
+                        enderecoFormatado,
+                        style: const TextStyle(
+                          color: AppCores.buttonBackground,
+                          fontFamily: 'Montserrat',
+                          fontSize: 15,
+                        ),
+                      ),
                       onTap: () {
                         _enderecoEntregaController.text = enderecoFormatado;
                         setState(() {
@@ -495,12 +512,12 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                     _dataEntrega == null
                         ? 'Selecione a data de entrega'
                         : 'Data de entrega: ${_dataEntrega!.day}/${_dataEntrega!.month}/${_dataEntrega!.year}',
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16, color: AppCores.inputLabel),
                   ),
                 ),
                 TextButton(
                   onPressed: () => _selecionarDataEntrega(context),
-                  child: const Text('Selecionar Data'),
+                  child: const Text('Selecionar Data', style: TextStyle(color: AppCores.buttonBackground)),
                 ),
               ],
             ),
@@ -509,7 +526,7 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
               onPressed: _loading ? null : _registrarPacote,
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: const Color.fromARGB(255, 3, 74, 131),
+                backgroundColor: AppCores.buttonBackground,
                 minimumSize: const Size.fromHeight(50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
@@ -518,13 +535,13 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: AppCores.buttonText,
                         strokeWidth: 2,
                       ),
                     )
                   : const Text(
                       'Cadastrar',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppCores.buttonText),
                     ),
             ),
             if (_error != null)
@@ -532,7 +549,7 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Text(
                   _error!,
-                  style: const TextStyle(color: Colors.red, fontSize: 16),
+                  style: const TextStyle(color: AppCores.error, fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -541,7 +558,7 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Text(
                   _success!,
-                  style: const TextStyle(color: Colors.green, fontSize: 16),
+                  style: const TextStyle(color: AppCores.success, fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -553,50 +570,38 @@ class CadastrarPacoteFormState extends State<CadastrarPacoteForm> {
 
   // Sugestão de endereços diretamente no campo
   void _mostrarSugestoesEndereco(BuildContext context, String query) async {
-    if (query.isEmpty) return;
-    final uri = Uri.parse(
-        'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&addressdetails=1&limit=5');
-    final response = await http.get(uri, headers: {'User-Agent': 'flutter_app'});
-    if (response.statusCode == 200) {
-      final results = jsonDecode(response.body);
-      final List<dynamic> sugestoes = (results is List)
-          ? results.where((item) => item['address'] != null).toList()
-          : [];
-      if (sugestoes.isNotEmpty && context.mounted) {
-        showModalBottomSheet(
-          context: context,
-          builder: (context) {
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: sugestoes.length,
-              itemBuilder: (context, index) {
-                final item = sugestoes[index];
-                final address = item['address'] ?? {};
-                final displayName = item['display_name'] as String?;
-                final enderecoFormatado = _formatarEnderecoSugestao(address, displayName);
-                return ListTile(
-                  title: Text(enderecoFormatado),
-                  onTap: () {
-                    _enderecoEntregaController.text = enderecoFormatado;
-                    Navigator.of(context).pop();
-                  },
-                );
-              },
-            );
-          },
-        );
-      }
+    _debounceEndereco?.cancel();
+    if (query.isEmpty) {
+      if (mounted) setState(() => _sugestoesEndereco = []);
+      return;
     }
+    _debounceEndereco = Timer(const Duration(seconds: 1), () async {
+      if (!mounted) return;
+      final uri = Uri.parse(
+          'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&addressdetails=1&limit=5');
+      final response = await http.get(uri, headers: {'User-Agent': 'flutter_app'});
+      if (!mounted) return;
+      if (response.statusCode == 200) {
+        final results = jsonDecode(response.body);
+        final List<dynamic> sugestoes = (results is List)
+            ? results.where((item) => item['address'] != null).take(4).toList()
+            : [];
+        setState(() {
+          _sugestoesEndereco = sugestoes;
+        });
+      }
+    });
   }
 
   String _formatarEnderecoSugestao(Map address, String? displayName) {
-    // Mesmo padrão do formatarEndereco
     final List<String> partes = [];
+    String? nomeLocal;
     if (displayName != null && displayName.isNotEmpty) {
-      final nomeLocal = displayName.split(',').first.trim();
+      nomeLocal = displayName.split(',').first.trim();
       if (nomeLocal.isNotEmpty) partes.add(nomeLocal);
     }
-    if (address['road'] != null) partes.add(address['road']);
+    // Só adiciona 'road' se for diferente do nomeLocal
+    if (address['road'] != null && address['road'] != nomeLocal) partes.add(address['road']);
     if (address['house_number'] != null) partes.add(address['house_number']);
     if (address['suburb'] != null) partes.add(address['suburb']);
     if (address['city'] != null) {

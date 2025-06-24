@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'api_config.dart';
+import '../../core/app_cores.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -21,6 +22,7 @@ class RegisterFormState extends State<RegisterForm> {
 
   bool _loading = false;
   String? _error;
+  String? _success;
   bool _obscureText = true;
   bool _obscureConfirmText = true;
 
@@ -155,7 +157,7 @@ class RegisterFormState extends State<RegisterForm> {
       children: [
         Text(
           _nameLabel,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppCores.inputLabel, fontFamily: 'Montserrat'),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -163,7 +165,9 @@ class RegisterFormState extends State<RegisterForm> {
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             hintText: _nameHint,
+            hintStyle: TextStyle(color: AppCores.inputHint, fontFamily: 'Montserrat'),
           ),
+          style: const TextStyle(color: AppCores.inputLabel, fontFamily: 'Montserrat'),
           textCapitalization: TextCapitalization.words,
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -182,7 +186,7 @@ class RegisterFormState extends State<RegisterForm> {
       children: [
         Text(
           _emailLabel,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppCores.inputLabel, fontFamily: 'Montserrat'),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -190,7 +194,9 @@ class RegisterFormState extends State<RegisterForm> {
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             hintText: _emailHint,
+            hintStyle: TextStyle(color: AppCores.inputHint, fontFamily: 'Montserrat'),
           ),
+          style: const TextStyle(color: AppCores.inputLabel, fontFamily: 'Montserrat'),
           keyboardType: TextInputType.emailAddress,
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -212,7 +218,7 @@ class RegisterFormState extends State<RegisterForm> {
       children: [
         Text(
           _passwordLabel,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppCores.inputLabel, fontFamily: 'Montserrat'),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -220,9 +226,11 @@ class RegisterFormState extends State<RegisterForm> {
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
             hintText: _passwordHint,
+            hintStyle: const TextStyle(color: AppCores.inputHint, fontFamily: 'Montserrat'),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureText ? Icons.visibility_off : Icons.visibility,
+                color: AppCores.inputLabel,
               ),
               onPressed: () {
                 setState(() {
@@ -231,6 +239,7 @@ class RegisterFormState extends State<RegisterForm> {
               },
             ),
           ),
+          style: const TextStyle(color: AppCores.inputLabel, fontFamily: 'Montserrat'),
           obscureText: _obscureText,
           validator: (value) {
             if (value == null || value.isEmpty || value.length < 6) {
@@ -255,7 +264,7 @@ class RegisterFormState extends State<RegisterForm> {
       children: [
         Text(
           _confirmPasswordLabel,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppCores.inputLabel, fontFamily: 'Montserrat'),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -263,9 +272,11 @@ class RegisterFormState extends State<RegisterForm> {
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
             hintText: _confirmPasswordHint,
+            hintStyle: const TextStyle(color: AppCores.inputHint, fontFamily: 'Montserrat'),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureConfirmText ? Icons.visibility_off : Icons.visibility,
+                color: AppCores.inputLabel,
               ),
               onPressed: () {
                 setState(() {
@@ -274,6 +285,7 @@ class RegisterFormState extends State<RegisterForm> {
               },
             ),
           ),
+          style: const TextStyle(color: AppCores.inputLabel, fontFamily: 'Montserrat'),
           obscureText: _obscureConfirmText,
           validator: (value) {
             if (value != _passwordController.text) {
@@ -292,7 +304,7 @@ class RegisterFormState extends State<RegisterForm> {
       children: [
         Text(
           _cnhLabel,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppCores.inputLabel, fontFamily: 'Montserrat'),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -300,7 +312,9 @@ class RegisterFormState extends State<RegisterForm> {
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             hintText: _cnhHint,
+            hintStyle: TextStyle(color: AppCores.inputHint, fontFamily: 'Montserrat'),
           ),
+          style: const TextStyle(color: AppCores.inputLabel, fontFamily: 'Montserrat'),
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           validator: (value) {
@@ -314,38 +328,38 @@ class RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  Widget _buildLoginLink() {
-    return TextButton(
-      onPressed: _navigateToLogin,
-      child: const Text(
-        _loginText,
-        style: TextStyle(color: Colors.blue),
-      ),
-    );
-  }
-
   Widget _buildRegisterButton() {
     return OutlinedButton(
       onPressed: _loading ? null : _register,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 16),
-        backgroundColor: const Color.fromARGB(255, 3, 74, 131),
+        backgroundColor: AppCores.buttonBackground,
         minimumSize: const Size.fromHeight(50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       child: _loading
           ? const SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
-                color: Colors.white,
+                color: AppCores.buttonText,
                 strokeWidth: 2,
               ),
             )
           : Text(
               _registerButton,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: AppCores.buttonText, fontFamily: 'Montserrat'),
             ),
+    );
+  }
+
+  Widget _buildLoginLink() {
+    return TextButton(
+      onPressed: _navigateToLogin,
+      child: const Text(
+        _loginText,
+        style: TextStyle(color: AppCores.buttonBackground, fontFamily: 'Montserrat'),
+      ),
     );
   }
 
@@ -363,7 +377,8 @@ class RegisterFormState extends State<RegisterForm> {
                 _registerTitle,
                 style: const TextStyle(
                   fontSize: 28,
-                  color: Colors.black,
+                  color: AppCores.title,
+                  fontFamily: 'Montserrat',
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -386,7 +401,16 @@ class RegisterFormState extends State<RegisterForm> {
                   padding: const EdgeInsets.only(top: 16.0),
                   child: Text(
                     _error!,
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    style: TextStyle(color: AppCores.error, fontSize: 16, fontFamily: 'Montserrat'),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              if (_success != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    _success!,
+                    style: TextStyle(color: AppCores.success, fontSize: 16, fontFamily: 'Montserrat'),
                     textAlign: TextAlign.center,
                   ),
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'api_config.dart';
+import '../../core/app_cores.dart';
 
 class ListarPacotesList extends StatefulWidget {
   const ListarPacotesList({super.key});
@@ -55,7 +56,7 @@ class _ListarPacotesListState extends State<ListarPacotesList> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null) {
-      return Center(child: Text(_error!, style: const TextStyle(color: Colors.red)));
+      return Center(child: Text(_error!, style: TextStyle(color: AppCores.error, fontFamily: 'Montserrat')));
     }
     if (_pacotes.isEmpty) {
       return const Center(child: Text('Nenhum pacote cadastrado.'));
@@ -65,16 +66,24 @@ class _ListarPacotesListState extends State<ListarPacotesList> {
       itemBuilder: (context, index) {
         final pacote = _pacotes[index];
         return Card(
+          color: AppCores.cardBackground,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ListTile(
-            title: Text('Pacote #${pacote['nr_pacote']}'),
+            title: Text(
+              'Pacote #${pacote['nr_pacote']}',
+              style: TextStyle(
+                color: AppCores.title,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Montserrat',
+              ),
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Empresa: ${pacote['empresa_origem']}'),
-                Text('Endereço: ${pacote['endereco_entrega']}'),
-                Text('Entrega: ${pacote['data_entrega']?.substring(0, 10) ?? ''}'),
-                Text('Cadastro: ${pacote['data_cadastro']?.substring(0, 10) ?? ''}'),
+                Text('Empresa: ${pacote['empresa_origem']}', style: TextStyle(color: AppCores.cardText, fontFamily: 'Montserrat')),
+                Text('Endereço: ${pacote['endereco_entrega']}', style: TextStyle(color: AppCores.cardText, fontFamily: 'Montserrat')),
+                Text('Entrega: ${pacote['data_entrega']?.substring(0, 10) ?? ''}', style: TextStyle(color: AppCores.cardText, fontFamily: 'Montserrat')),
+                Text('Cadastro: ${pacote['data_cadastro']?.substring(0, 10) ?? ''}', style: TextStyle(color: AppCores.cardText, fontFamily: 'Montserrat')),
               ],
             ),
           ),

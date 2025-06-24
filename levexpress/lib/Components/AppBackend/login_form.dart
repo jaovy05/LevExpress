@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'api_config.dart';
+import '../../core/app_cores.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -110,7 +111,7 @@ class LoginFormState extends State<LoginForm> {
       children: [
         const Text(
           'Email',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppCores.inputLabel, fontFamily: 'Montserrat'),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -118,7 +119,9 @@ class LoginFormState extends State<LoginForm> {
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             hintText: 'Digite seu email',
+            hintStyle: TextStyle(color: AppCores.inputHint, fontFamily: 'Montserrat'),
           ),
+          style: const TextStyle(color: AppCores.inputLabel, fontFamily: 'Montserrat'),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Por favor, insira um email válido';
@@ -136,7 +139,7 @@ class LoginFormState extends State<LoginForm> {
       children: [
         const Text(
           'Senha',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppCores.inputLabel, fontFamily: 'Montserrat'),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -144,9 +147,11 @@ class LoginFormState extends State<LoginForm> {
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
             hintText: 'Digite sua senha',
+            hintStyle: const TextStyle(color: AppCores.inputHint, fontFamily: 'Montserrat'),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureText ? Icons.visibility_off : Icons.visibility,
+                color: AppCores.inputLabel,
               ),
               onPressed: () {
                 setState(() {
@@ -155,6 +160,7 @@ class LoginFormState extends State<LoginForm> {
               },
             ),
           ),
+          style: const TextStyle(color: AppCores.inputLabel, fontFamily: 'Montserrat'),
           obscureText: _obscureText,
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -172,22 +178,22 @@ class LoginFormState extends State<LoginForm> {
       onPressed: _loading ? null : _login,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 16),
-        backgroundColor: const Color.fromARGB(255, 3, 74, 131),
+        backgroundColor: AppCores.buttonBackground,
         minimumSize: const Size.fromHeight(50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       child: _loading
           ? const SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
-                color: Colors.white,
+                color: AppCores.buttonText,
                 strokeWidth: 2,
               ),
             )
           : const Text(
               'Entrar',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppCores.buttonText, fontFamily: 'Montserrat'),
             ),
     );
   }
@@ -199,13 +205,13 @@ class LoginFormState extends State<LoginForm> {
         children: [
           const Text(
             'Não tem conta ainda?',
-            style: TextStyle(color: Colors.black),
+            style: TextStyle(color: AppCores.body, fontFamily: 'Montserrat'),
           ),
           TextButton(
             onPressed: _navigateToRegister,
             child: const Text(
               'Criar conta',
-              style: TextStyle(color: Color.fromARGB(255, 3, 74, 131)),
+              style: TextStyle(color: AppCores.buttonBackground, fontFamily: 'Montserrat'),
             ),
           ),
         ],
@@ -227,7 +233,8 @@ class LoginFormState extends State<LoginForm> {
                 'Entrar',
                 style: TextStyle(
                   fontSize: 28,
-                  color: Colors.black,
+                  color: AppCores.title,
+                  fontFamily: 'Montserrat',
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -244,7 +251,7 @@ class LoginFormState extends State<LoginForm> {
                   padding: const EdgeInsets.only(top: 16.0),
                   child: Text(
                     _error!,
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    style: TextStyle(color: AppCores.error, fontSize: 16, fontFamily: 'Montserrat'),
                     textAlign: TextAlign.center,
                   ),
                 ),
