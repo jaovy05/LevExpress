@@ -18,12 +18,16 @@ class LoginScreen extends StatelessWidget {
           ),
         )
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            LoginForm(),
-          ],
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+              LoginForm(),
+            ],
+          ),
         ),
       ),
     );

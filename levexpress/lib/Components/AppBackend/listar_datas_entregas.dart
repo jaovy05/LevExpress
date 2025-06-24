@@ -19,17 +19,31 @@ class ListarDatasEntregasState extends State<ListarDatasEntregas> {
   void initState() {
     super.initState();
     _fetchPacotes();
+    _limparListaPacotes();
+  }
+
+  void _limparListaPacotes() {
+    _pacotes.clear();
+    _loading = true;
+    _error = null;
+    _pacotes = []; 
   }
 
   Future<void> _fetchPacotes() async {
     setState(() {
       _loading = true;
       _error = null;
+      _pacotes = [];
     });
     try {
       final response = await http.get(Uri.parse('$apiBaseUrl/pacotes'));
+      _limparListaPacotes();
+      setState(() {
+        _pacotes = [];
+      });
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        _pacotes = [];
         setState(() {
           _pacotes = data['pacotes'] ?? [];
         });
