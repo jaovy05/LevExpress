@@ -21,7 +21,11 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Iniciar Rota'),
-          content: const ListarDatasEntregas(),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 400, // defina uma altura máxima para o ListView
+            child: const ListarDatasEntregas(),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),

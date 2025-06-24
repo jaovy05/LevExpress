@@ -122,7 +122,10 @@ class api_map_state extends State<api_map> {
           _pacoteMarkers.addAll(markers);
         });
 
-        await _calcularRotaComOSRM([_currentLocation!, ...entregas.map((e) => e['coordenada'] as LatLng)]);
+        // Só calcula rota se houver localização e pelo menos um destino
+        if (_currentLocation != null && entregas.isNotEmpty) {
+          await _calcularRotaComOSRM([_currentLocation!, ...entregas.map((e) => e['coordenada'] as LatLng)]);
+        }
       } else {
         setState(() => _error = 'Erro ao buscar pacotes');
       }
@@ -180,7 +183,12 @@ class api_map_state extends State<api_map> {
     }
 
     try {
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      // Para versões recentes do geolocator, use LocationSettings diretamente
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
       });
@@ -212,7 +220,7 @@ class api_map_state extends State<api_map> {
           if (_error != null)
             Container(
               padding: const EdgeInsets.all(12),
-              color: Colors.red.withOpacity(0.2),
+              color: Colors.red.withAlpha((0.2 * 255).toInt()),
               child: Text(_error!, style: const TextStyle(color: Colors.red)),
             ),
           Expanded(
