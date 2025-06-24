@@ -16,7 +16,10 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime? selectedDate;
 
   void _navigateToCadastroPacote(BuildContext context) async {
-    final selectedDate = await showDialog<DateTime>(
+    setState(() {
+      selectedDate = null; // Limpa a data selecionada
+    });
+    final DateTime? pickedDate = await showDialog<DateTime>(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -42,9 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
 
-    if (selectedDate != null) {
+    if (pickedDate != null) {
       setState(() {
-        this.selectedDate = selectedDate;
+        selectedDate = pickedDate;
       });
     }
   }
@@ -97,6 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       right: 16,
                       child: PlusButton(
                         onPressed: () {
+                          setState(() {
+                            selectedDate = null; // Limpa a data selecionada
+                          });
                           Navigator.pushNamed(context, '/cadastrar-pacote');
                         },
                       ),
